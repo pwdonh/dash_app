@@ -466,6 +466,7 @@ def update_figure(jdiv, i_talk, annot_sel, prob_cutoff, urlcontent):
 def update_figure_meg(jdiv, i_talk, metric, urlcontent):
     if urlcontent is not None:
         urlcontent = urlcontent.split('/')[-1]
+    print(urlcontent)
     if urlcontent=='meg':
         # print(jdata_meg['talks'][i_talk]['y_hat'][0][:20])
         divdata = json.loads(jdiv)
