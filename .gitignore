@@ -1,0 +1,5 @@
+deploy_logs.txt
+venv
+*.pyc
+.DS_Store
+vv
