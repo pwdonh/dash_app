@@ -108,20 +108,20 @@ print(time()-a)
 print("Load data MEG")
 meg_jsonfile = 'main_ridge_subj%d_A+KM+KS+KE+AxKS+AxKE_bandpass_5_0_coreg_True_True_skip1_bandpassam_0_0_model_timeseries.json'
 jdata_meg = []
-for i_subj in range(11):
+for i_subj in [2]:
     # with open(meg_jsonfile %i_subj) as f:
     #     jdata_meg.append(json.loads(f.read()))
     jdata_meg.append(load_from_url(meg_jsonfile %i_subj))
 jdata_meg.append(deepcopy(jdata_meg[-1]))
-for i_talk in range(7):
-    # print([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
-    n_samples = min([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
-    data = np.array([np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[:,:,:n_samples] for i_subj in range(11)])
-    print(data.shape)
-    # lo, hi, avg = bootstrap_ci(data)
-    avg = np.mean(data,0)
-    jdata_meg[-1]['talks'][i_talk]['y_hat'] = avg
-    # print(np.shape(data))
+# for i_talk in range(7):
+#     # print([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
+#     n_samples = min([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
+#     data = np.array([np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[:,:,:n_samples] for i_subj in range(11)])
+#     print(data.shape)
+#     # lo, hi, avg = bootstrap_ci(data)
+#     avg = np.mean(data,0)
+#     jdata_meg[-1]['talks'][i_talk]['y_hat'] = avg
+#     # print(np.shape(data))
 i_subj = -1
 print(time()-a)
 print("Done loading data")
@@ -466,7 +466,6 @@ def update_figure(jdiv, i_talk, annot_sel, prob_cutoff, urlcontent):
 def update_figure_meg(jdiv, i_talk, metric, urlcontent):
     if urlcontent is not None:
         urlcontent = urlcontent.split('/')[-1]
-    print(urlcontent)
     if urlcontent=='meg':
         # print(jdata_meg['talks'][i_talk]['y_hat'][0][:20])
         divdata = json.loads(jdiv)
