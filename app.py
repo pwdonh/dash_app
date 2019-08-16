@@ -141,11 +141,11 @@ def get_figure_data(jdata, dotsize, word_obs, annot_sel, is_annot):
     x = np.array(jdata['embed'][0])
     y = np.array(jdata['embed'][1])
     def annot_word(i_word, showarrow=True):
-        return dict(x=x[i_word],
-                    y=y[i_word],
+        return dict(x=x[i_word+2],
+                    y=y[i_word+2],
                     xref='x',
                     yref='y',
-                    text=jdata['vocab'][i_word],
+                    text=jdata['vocab'][i_word+2],
                     showarrow=showarrow,
                     ax=20,
                     ay=-20)
