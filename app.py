@@ -75,7 +75,7 @@ jdata_cp = load_from_url('talk_data_combined.json')
 jdata_cw = {}
 jdata_cw['vocab'] = jdata_cp['vocab_w']
 jdata_cw['embed'] = jdata_cp['embed_w']
-# jdata_cw['embed'] = jdata_w['embed']
+jdata_cw['embed'] = jdata_w['embed']
 jdata_cw['talks'] = []
 for i_talk, talkdat in enumerate(jdata_cp['talks']):
     words_cw = np.array(jdata_w['vocab'])[talkdat['data_words_w']]
@@ -105,26 +105,26 @@ def get_jdata(urlcontent, i_tier):
         jdata = jdata_w
     return jdata
 print(time()-a)
-print("Load data MEG")
-meg_jsonfile = 'main_ridge_subj%d_A+KM+KS+KE+AxKS+AxKE_bandpass_5_0_coreg_True_True_skip1_bandpassam_0_0_model_timeseries.json'
-jdata_meg = []
-for i_subj in [2]:
-    # with open(meg_jsonfile %i_subj) as f:
-    #     jdata_meg.append(json.loads(f.read()))
-    jdata_meg.append(load_from_url(meg_jsonfile %i_subj))
-jdata_meg.append(deepcopy(jdata_meg[-1]))
-# for i_talk in range(7):
-#     # print([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
-#     n_samples = min([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
-#     data = np.array([np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[:,:,:n_samples] for i_subj in range(11)])
-#     print(data.shape)
-#     # lo, hi, avg = bootstrap_ci(data)
-#     avg = np.mean(data,0)
-#     jdata_meg[-1]['talks'][i_talk]['y_hat'] = avg
-#     # print(np.shape(data))
-i_subj = -1
-print(time()-a)
-print("Done loading data")
+# print("Load data MEG")
+# meg_jsonfile = 'main_ridge_subj%d_A+KM+KS+KE+AxKS+AxKE_bandpass_5_0_coreg_True_True_skip1_bandpassam_0_0_model_timeseries.json'
+# jdata_meg = []
+# for i_subj in [2]:
+#     # with open(meg_jsonfile %i_subj) as f:
+#     #     jdata_meg.append(json.loads(f.read()))
+#     jdata_meg.append(load_from_url(meg_jsonfile %i_subj))
+# jdata_meg.append(deepcopy(jdata_meg[-1]))
+# # for i_talk in range(7):
+# #     # print([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
+# #     n_samples = min([np.shape(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1] for i_subj in range(11)])
+# #     data = np.array([np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[:,:,:n_samples] for i_subj in range(11)])
+# #     print(data.shape)
+# #     # lo, hi, avg = bootstrap_ci(data)
+# #     avg = np.mean(data,0)
+# #     jdata_meg[-1]['talks'][i_talk]['y_hat'] = avg
+# #     # print(np.shape(data))
+# i_subj = -1
+# print(time()-a)
+# print("Done loading data")
 
 n_words_show = 100
 i_talk_start = 2
@@ -141,11 +141,11 @@ def get_figure_data(jdata, dotsize, word_obs, annot_sel, is_annot):
     x = np.array(jdata['embed'][0])
     y = np.array(jdata['embed'][1])
     def annot_word(i_word, showarrow=True):
-        return dict(x=x[i_word+2],
-                    y=y[i_word+2],
+        return dict(x=x[i_word],
+                    y=y[i_word],
                     xref='x',
                     yref='y',
-                    text=jdata['vocab'][i_word+2],
+                    text=jdata['vocab'][i_word],
                     showarrow=showarrow,
                     ax=20,
                     ay=-20)
@@ -347,8 +347,8 @@ def change_page_content(urlcontent):
         urlcontent = urlcontent.split('/')[-1]
     if urlcontent=='combined':
         return get_layout('combined')
-    elif urlcontent=='meg':
-        return get_layout('meg')
+    # elif urlcontent=='meg':
+    #     return get_layout('meg')
     else:
         return get_layout('words')
 
@@ -458,91 +458,91 @@ def update_figure(jdiv, i_talk, annot_sel, prob_cutoff, urlcontent):
     jdata = get_jdata(urlcontent, 1)
     return update_figure_with_jdata(jdata, jdiv, i_talk, annot_sel, prob_cutoff)
 
-# Update the embedding figure after word is clicked
-@app.callback(Output('meg_traces', 'figure'), [Input('divdata', 'children'),
-                                               Input('talk-select', 'value'),
-                                               Input('metric-select', 'value'),
-                                               Input('url', 'pathname')])
-def update_figure_meg(jdiv, i_talk, metric, urlcontent):
-    if urlcontent is not None:
-        urlcontent = urlcontent.split('/')[-1]
-    if urlcontent=='meg':
-        # print(jdata_meg['talks'][i_talk]['y_hat'][0][:20])
-        divdata = json.loads(jdiv)
-        i_clicked = divdata['word_clicked']+divdata['words_show'][0]
-        # print(jdata_meg[i_subj]['talks'][i_talk]['index_words'][i_clicked])
-        index_words = np.array(jdata_meg[i_subj]['talks'][i_talk]['index_words'])
-        i_sample = index_words[i_clicked]
-        samples_win = [i_sample+n_samples_win[0], i_sample+n_samples_win[1]]
-        samples_show = np.arange(samples_win[0], samples_win[1])
-        index_words_show = index_words[(index_words>samples_win[0])&(index_words<samples_win[1])]
-        strings = np.array(jdata_cw['talks'][i_talk]['string'])[(index_words>samples_win[0])&(index_words<samples_win[1])]
-        # print(x[index_words_show-samples_win[0]])
-        meg_traces_base = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1,:,samples_show].T
-        meg_traces_full = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[0,:,samples_show].T
-        if metric=='entropy':
-            col = '59, 76, 192'
-            meg_traces = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[2,:,samples_show].T
-        elif metric=='surprise':
-            col = '209, 73, 63'
-            meg_traces = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[1,:,samples_show].T
-        else:
-            col = '100, 100, 100'
-            meg_traces = meg_traces_base
-        x = np.linspace(t_win[0],t_win[1],len(meg_traces[0]))
-    return {
-        'data': [go.Scatter(
-                    x=x,
-                    y=meg_trace-3+i_trace*6,
-                    hoverinfo='none',
-                    line = dict(
-                        color = ('rgba(100,100,100,.75)'))
-                 ) for i_trace, meg_trace in enumerate(meg_traces_base)] + [go.Scatter(
-                 #             x=x,
-                 #             y=meg_trace-3+i_trace*6,
-                 #             hoverinfo='none',
-                 #             line = dict(
-                 #                 color = ('rgba(30,30,30,.75)'))
-                 # ) for i_trace, meg_trace in enumerate(meg_traces_full)] + [go.Scatter(
-                    x=x,
-                    y=meg_trace-3+i_trace*6,
-                    hoverinfo='none',
-                    line = dict(
-                        color = ('rgba(%s,.75)' %col))
-                 ) for i_trace, meg_trace in enumerate(meg_traces)] + [go.Scatter(
-                             x=x,
-                             y=np.zeros(len(meg_trace))-3+i_trace*6,
-                             hoverinfo='none',
-                             line = dict(
-                                 color = ('rgba(150,150,150,.75)'),
-                                 width = 1)
-                 ) for i_trace, meg_trace in enumerate(meg_traces)] + [go.Scatter(
-                             x=x[index_words_show-samples_win[0]],
-                             y=np.zeros(len(index_words_show)),
-                             text=strings,
-                             showlegend=False,
-                             textposition='bottom center',
-                             mode='markers',
-                             marker = dict(size = 2,
-                                           color = ('rgba(50,50,50,.75)'))
-                 )],
-        'layout': go.Layout(
-                    autosize=True,
-                    hovermode = 'closest',
-                    yaxis = dict(zeroline = False, range=[-6.5, 6.5],
-                                 showticklabels=False, mirror=True, showline=True),
-                    xaxis = dict(range=t_win,
-                                 mirror=True, showline=True),
-                    showlegend = False,
-                    margin = go.Margin(
-                                l=5,
-                                r=5,
-                                b=30,
-                                t=15,
-                                pad=4
-                             )
-                    )
-    }
+# # Update the embedding figure after word is clicked
+# @app.callback(Output('meg_traces', 'figure'), [Input('divdata', 'children'),
+#                                                Input('talk-select', 'value'),
+#                                                Input('metric-select', 'value'),
+#                                                Input('url', 'pathname')])
+# def update_figure_meg(jdiv, i_talk, metric, urlcontent):
+#     if urlcontent is not None:
+#         urlcontent = urlcontent.split('/')[-1]
+#     if urlcontent=='meg':
+#         # print(jdata_meg['talks'][i_talk]['y_hat'][0][:20])
+#         divdata = json.loads(jdiv)
+#         i_clicked = divdata['word_clicked']+divdata['words_show'][0]
+#         # print(jdata_meg[i_subj]['talks'][i_talk]['index_words'][i_clicked])
+#         index_words = np.array(jdata_meg[i_subj]['talks'][i_talk]['index_words'])
+#         i_sample = index_words[i_clicked]
+#         samples_win = [i_sample+n_samples_win[0], i_sample+n_samples_win[1]]
+#         samples_show = np.arange(samples_win[0], samples_win[1])
+#         index_words_show = index_words[(index_words>samples_win[0])&(index_words<samples_win[1])]
+#         strings = np.array(jdata_cw['talks'][i_talk]['string'])[(index_words>samples_win[0])&(index_words<samples_win[1])]
+#         # print(x[index_words_show-samples_win[0]])
+#         meg_traces_base = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[-1,:,samples_show].T
+#         meg_traces_full = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[0,:,samples_show].T
+#         if metric=='entropy':
+#             col = '59, 76, 192'
+#             meg_traces = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[2,:,samples_show].T
+#         elif metric=='surprise':
+#             col = '209, 73, 63'
+#             meg_traces = np.array(jdata_meg[i_subj]['talks'][i_talk]['y_hat'])[1,:,samples_show].T
+#         else:
+#             col = '100, 100, 100'
+#             meg_traces = meg_traces_base
+#         x = np.linspace(t_win[0],t_win[1],len(meg_traces[0]))
+#     return {
+#         'data': [go.Scatter(
+#                     x=x,
+#                     y=meg_trace-3+i_trace*6,
+#                     hoverinfo='none',
+#                     line = dict(
+#                         color = ('rgba(100,100,100,.75)'))
+#                  ) for i_trace, meg_trace in enumerate(meg_traces_base)] + [go.Scatter(
+#                  #             x=x,
+#                  #             y=meg_trace-3+i_trace*6,
+#                  #             hoverinfo='none',
+#                  #             line = dict(
+#                  #                 color = ('rgba(30,30,30,.75)'))
+#                  # ) for i_trace, meg_trace in enumerate(meg_traces_full)] + [go.Scatter(
+#                     x=x,
+#                     y=meg_trace-3+i_trace*6,
+#                     hoverinfo='none',
+#                     line = dict(
+#                         color = ('rgba(%s,.75)' %col))
+#                  ) for i_trace, meg_trace in enumerate(meg_traces)] + [go.Scatter(
+#                              x=x,
+#                              y=np.zeros(len(meg_trace))-3+i_trace*6,
+#                              hoverinfo='none',
+#                              line = dict(
+#                                  color = ('rgba(150,150,150,.75)'),
+#                                  width = 1)
+#                  ) for i_trace, meg_trace in enumerate(meg_traces)] + [go.Scatter(
+#                              x=x[index_words_show-samples_win[0]],
+#                              y=np.zeros(len(index_words_show)),
+#                              text=strings,
+#                              showlegend=False,
+#                              textposition='bottom center',
+#                              mode='markers',
+#                              marker = dict(size = 2,
+#                                            color = ('rgba(50,50,50,.75)'))
+#                  )],
+#         'layout': go.Layout(
+#                     autosize=True,
+#                     hovermode = 'closest',
+#                     yaxis = dict(zeroline = False, range=[-6.5, 6.5],
+#                                  showticklabels=False, mirror=True, showline=True),
+#                     xaxis = dict(range=t_win,
+#                                  mirror=True, showline=True),
+#                     showlegend = False,
+#                     margin = go.Margin(
+#                                 l=5,
+#                                 r=5,
+#                                 b=30,
+#                                 t=15,
+#                                 pad=4
+#                              )
+#                     )
+#     }
 
 @app.callback(Output('prob-cutoff', 'disabled'), [Input('annot-select', 'value')])
 def disable_num_annot(annot_sel):
