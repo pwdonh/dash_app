@@ -27,7 +27,7 @@ from time import time
 
 external_css = [
     'https://codepen.io/chriddyp/pen/bWLwgP.css',
-    'http://www.bic.mni.mcgill.ca/~peterd/dash_demo.css'
+    'https://www.bic.mni.mcgill.ca/~peterd/dash_demo.css'
 ]
 
 app = dash.Dash(
