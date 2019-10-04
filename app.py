@@ -284,7 +284,7 @@ def get_layout(tier='words'):
              html.Div(dcc.Dropdown(
                          id="metric-select",
                          options=[
-                             {'label': 'Entropy', 'value': 'entropy'},
+                             {'label': 'Uncertainty', 'value': 'entropy'},
                              {'label': 'Surprise', 'value': 'surprise'},
                              {'label': 'No coloring', 'value': 'none'}
                          ],
